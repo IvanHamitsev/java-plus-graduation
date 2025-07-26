@@ -4,7 +4,7 @@
 Стек: Java, Spring Boot, REST API, Hibernate, PostgreSQL  
 
 ## Setup  
-Для работы приложения необходимо: Java 21, запущенный PostegreSQL (порт 5432)  
+Для работы приложения необходимо: Java 21, запущенный PostgreSQL (порт 5432)  
 
 ### Разбиение на модули  
 Main-server - основной модуль приложения  
