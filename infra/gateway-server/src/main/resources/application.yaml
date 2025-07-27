@@ -20,9 +20,7 @@ eureka:
     hostname: localhost
     port: 8761
     preferIpAddress: true
-    instance-id: "${spring.application.name}:${random.value}"
-    leaseRenewalIntervalInSeconds: 10
   client:
-    registerWithEureka: false
+    registerWithEureka: true
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
