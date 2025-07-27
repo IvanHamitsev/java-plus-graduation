@@ -32,5 +32,9 @@ spring:
 
           predicates:
             - Path=/compilations/**
+    loadbalancer:
+      configurations: health-check
+      retry:
+        enabled: true
 server:
   port: 8080
