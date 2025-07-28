@@ -17,9 +17,9 @@ public interface StatsClientInterface {
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     public List<StatsResponseDto> getAllStats(@DateTimeFormat(pattern = PATTERN_FOR_TIME) @RequestParam(value = "start") LocalDateTime start,
-                                           @DateTimeFormat(pattern = PATTERN_FOR_TIME) @RequestParam(value = "end") LocalDateTime end,
-                                           @RequestParam(required = false) List<String> uris,
-                                           @RequestParam(required = false, defaultValue = "false") Boolean unique);
+                                              @DateTimeFormat(pattern = PATTERN_FOR_TIME) @RequestParam(value = "end") LocalDateTime end,
+                                              @RequestParam(required = false) List<String> uris,
+                                              @RequestParam(required = false, defaultValue = "false") Boolean unique);
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
