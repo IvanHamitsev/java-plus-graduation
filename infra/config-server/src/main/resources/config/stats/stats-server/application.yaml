@@ -1,0 +1,20 @@
+server:
+  port: 0
+  uri: http://${spring.application.name}:${server.port}
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc.time_zone: UTC
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/explore-stats
+    username: vxuser
+    password: vxpasswd

@@ -1,11 +1,11 @@
 spring:
-  application:
-    name: stats-server
-  config:
-    import: "configserver:"
   main:
     banner-mode: off
     log-startup-info: false
+  application:
+    name: gateway-server
+  config:
+    import: "configserver:"
   cloud:
     config:
       discovery:
@@ -19,7 +19,7 @@ eureka:
   instance:
     hostname: localhost
     port: 8761
-    instance-id: "${spring.application.name}:${random.value}"
+    preferIpAddress: true
   client:
     registerWithEureka: true
     serviceUrl:
