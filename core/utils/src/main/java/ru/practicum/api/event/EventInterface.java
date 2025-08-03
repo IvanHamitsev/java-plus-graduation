@@ -1,9 +1,9 @@
 package ru.practicum.api.event;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -81,9 +81,9 @@ public interface EventInterface {
             @PathVariable Long eventId,
             @Valid @RequestBody UpdateEventUserRequest event
     ) throws ValidationException, ConflictException, WrongDataException, NotFoundException;
-	
-	// выделить в отдельный интерфейс?
-	
+
+    // выделить в отдельный интерфейс?
+
     @GetMapping("/inner/event/{eventId}")
     EventFullDto getInnerEventById(@PathVariable Long eventId) throws NotFoundException;
 

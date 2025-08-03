@@ -1,10 +1,12 @@
 package ru.practicum.category.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.api.category.CategoryInterface;
 import ru.practicum.category.service.CategoryService;
 import ru.practicum.dto.category.CategoryDto;
-import ru.practicum.api.category.CategoryInterface;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 
@@ -31,8 +33,8 @@ public class CategoryController implements CategoryInterface {
     public void deleteCategory(Long catId) throws ConflictException, NotFoundException {
         categoryService.deleteCategory(catId);
     }
-	
-	@Override
+
+    @Override
     public boolean existById(Long categoryId) {
         return categoryService.existById(categoryId);
     }
@@ -41,10 +43,10 @@ public class CategoryController implements CategoryInterface {
     public List<CategoryDto> getCategoriesByIds(Set<Long> ids) {
         return categoryService.getCategoriesByIds(ids);
     }
-	
-	    @Override
+
+    @Override
     public List<CategoryDto> getAllCategories(@RequestParam(required = false, defaultValue = "0") Integer from,
-                                             @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                              @RequestParam(required = false, defaultValue = "10") Integer size) {
         return categoryService.getAllCategories(from, size);
     }
 
