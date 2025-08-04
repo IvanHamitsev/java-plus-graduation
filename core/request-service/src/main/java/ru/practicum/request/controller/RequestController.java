@@ -1,8 +1,6 @@
 package ru.practicum.request.controller;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.api.request.EventRequestInterface;
 import ru.practicum.dto.request.EventRequestDto;
@@ -15,10 +13,9 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestController implements EventRequestInterface {
 
-    final EventRequestService requestService;
+    private final EventRequestService requestService;
 
     @Override
     public EventRequestDto addEventRequest(Long userId, Long eventId) throws ConflictException, NotFoundException {
