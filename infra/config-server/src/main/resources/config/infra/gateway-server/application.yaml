@@ -8,10 +8,26 @@ spring:
       discovery.locator.enabled: true
       actuator.verbose.enabled: false
       routes:
-        - id: main_service_route
-          uri: lb://MAIN-SERVICE
+        - id: user_service_route
+          uri: lb://USER-SERVICE
           predicates:
-            - Path=/admin/**,/users/**,/events/**,/compilations/**,/categories/**
+            - Path=/admin/users/**
+        - id: category_service_route
+          uri: lb://CATEGORY-SERVICE
+          predicates:
+            - Path=/admin/categories/**,/categories/**
+        - id: request_service_route
+          uri: lb://REQUEST-SERVICE
+          predicates:
+            - Path=/users/{userId}/requests/**,/users/{userId}/events/{eventId}/requests/**
+        - id: comment_service_route
+          uri: lb://COMMENT-SERVICE
+          predicates:
+            - Path=/admin/comments/**,/users/{userId}/comments/**
+        - id: event_service_route
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/admin/events/**,/events/**,/users/{userId}/events/**,/admin/compilations/**,/compilations/**
 server:
   port: 8080
 management:
