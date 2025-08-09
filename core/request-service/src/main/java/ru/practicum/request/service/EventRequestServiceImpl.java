@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import com.google.protobuf.Timestamp;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.api.event.EventClient;
@@ -18,7 +19,11 @@ import ru.practicum.exception.ValidationException;
 import ru.practicum.request.mapper.EventRequestMapper;
 import ru.practicum.request.model.EventRequest;
 import ru.practicum.request.repository.RequestRepository;
+import ru.practicum.stats.proto.ActionTypeProto;
+import ru.practicum.stats.proto.UserActionProto;
+import ru.practicum.stats.client.CollectorClient;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,7 @@ public class EventRequestServiceImpl implements EventRequestService {
     final RequestRepository requestRepository;
     final UserClient userClient;
     final EventClient eventClient;
+    final CollectorClient collectorClient;
 
     final EventRequestMapper eventRequestMapper;
 
@@ -43,6 +49,9 @@ public class EventRequestServiceImpl implements EventRequestService {
     public EventRequestDto addRequest(Long userId, Long eventId) throws ConflictException, NotFoundException {
         UserDto user = userClient.getById(userId);
         EventFullDto event = getEventById(eventId);
+
+        // отправить информацию в расчёт рекомендаций
+        collectorClient.sendUserAction(createUserAction(eventId, userId, ActionTypeProto.ACTION_REGISTER, Instant.now()));
 
         if (event.getInitiator().getId().equals(userId)) {
             throw new ConflictException("Создатель события не может подать заявку на участие");
@@ -178,6 +187,23 @@ public class EventRequestServiceImpl implements EventRequestService {
         return requestRepository.findByEventIds(id).stream()
                 .map(eventRequestMapper::mapRequest)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean ifUserTakePart(Long userId, Long eventId) {
+        return requestRepository.userTakePart(userId, eventId);
+    }
+
+    private UserActionProto createUserAction(Long eventId, Long userId, ActionTypeProto type, Instant timestamp) {
+        return UserActionProto.newBuilder()
+                .setUserId(userId)
+                .setEventId(eventId)
+                .setActionType(type)
+                .setTimestamp(Timestamp.newBuilder()
+                        .setSeconds(timestamp.getEpochSecond())
+                        .setNanos(timestamp.getNano())
+                        .build())
+                .build();
     }
 
     private EventRequest createNewEventRequest(UserDto user, EventFullDto event) {
