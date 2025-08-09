@@ -25,5 +25,4 @@ public class PublicCompilationController implements PublicCompilationInterface {
         return compilationService.getCompilationById(compId);
     }
 
-
 }

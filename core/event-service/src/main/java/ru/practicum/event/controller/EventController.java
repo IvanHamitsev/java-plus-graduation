@@ -32,8 +32,20 @@ public class EventController implements EventInterface {
     final UserEventService userEventService;
 
     @Override
-    public EventFullDto getEventById(Long id, HttpServletRequest request) throws NotFoundException {
-        return eventService.getEventById(id, request.getRequestURI(), request.getRemoteAddr());
+    public EventFullDto getEventById(Long id,
+                                     Long userId,
+                                     HttpServletRequest request) throws NotFoundException {
+        return eventService.getEventById(id, userId, request.getRequestURI(), request.getRemoteAddr());
+    }
+
+    @Override
+    public List<EventFullDto> getRecommendations(Long userId) {
+        return eventService.getRecommendations(userId);
+    }
+
+    @Override
+    public void likeEvent(Long eventId, Long userId) throws ValidationException {
+        eventService.likeEvent(eventId, userId);
     }
 
     @Override
