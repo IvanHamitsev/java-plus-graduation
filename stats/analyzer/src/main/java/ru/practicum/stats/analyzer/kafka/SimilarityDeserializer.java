@@ -7,6 +7,7 @@ public class SimilarityDeserializer extends BaseAvroDeserializer<EventSimilarity
     public SimilarityDeserializer() {
         super(EventSimilarityAvro.getClassSchema());
     }
+
     public SimilarityDeserializer(Schema schema) {
         super(schema);
     }

@@ -12,7 +12,7 @@ import java.util.Properties;
 
 @ConfigurationProperties("kafkaconfig")
 @AllArgsConstructor
-public class KafkaConfig {
+public class KafkaConfigs {
     private final String url;
     private final String topic;
 

@@ -19,6 +19,7 @@ import java.util.Properties;
 @AllArgsConstructor
 public class KafkaConfigs {
     private final String url;
+    // topics
     private final String action;
     private final String similarity;
 

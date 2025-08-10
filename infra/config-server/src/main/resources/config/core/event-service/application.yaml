@@ -7,7 +7,7 @@ grpc:
       negotiationType: plaintext
       enableRetry: true
       retryAttempts: 15
-      retryDelay: 3000
+      retryDelay: 1000
     collector:
       address: 'discovery:///collector'
       enableKeepAlive: true
@@ -15,7 +15,7 @@ grpc:
       negotiationType: plaintext
       enableRetry: true
       retryAttempts: 15
-      retryDelay: 3000
+      retryDelay: 1000
 server:
   port: 0
 spring:

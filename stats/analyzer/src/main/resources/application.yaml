@@ -19,9 +19,6 @@ eureka:
   instance:
     hostname: localhost
     port: 8761
-    preferIpAddress: true
-    instance-id: "${spring.application.name}:${random.value}"
-    leaseRenewalIntervalInSeconds: 10
   client:
     registerWithEureka: true
     serviceUrl:

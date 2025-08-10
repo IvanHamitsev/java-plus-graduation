@@ -24,7 +24,7 @@ public class AggregatorStarter implements Runnable {
     public void run() {
         try {
             while (true) {
-                ConsumerRecords<String, UserActionAvro> records = userActionConsumer.poll(Duration.ofMillis(500));
+                ConsumerRecords<String, UserActionAvro> records = userActionConsumer.poll(Duration.ofMillis(100));
 
                 for (ConsumerRecord<String, UserActionAvro> record : records) {
                     userActionProducer.process(record.value());
