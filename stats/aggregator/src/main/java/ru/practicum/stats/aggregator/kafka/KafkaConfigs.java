@@ -18,7 +18,7 @@ import ru.practicum.stats.avro.UserActionAvro;
 import java.util.List;
 import java.util.Properties;
 
-@ConfigurationProperties
+@ConfigurationProperties("kafkaconfig")
 @AllArgsConstructor
 public class KafkaConfigs {
     private final String url;
