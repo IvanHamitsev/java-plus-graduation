@@ -23,7 +23,17 @@ import static ru.practicum.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 public interface EventInterface {
 
     @GetMapping("/events/{id}")
-    EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) throws NotFoundException;
+    EventFullDto getEventById(
+            @PathVariable Long id,
+            @RequestHeader("X-EWM-USER-ID") Long userId,
+            HttpServletRequest request
+    ) throws NotFoundException;
+
+    @GetMapping("/events/recommendation")
+    List<EventFullDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId);
+
+    @PutMapping("/events/{eventId}/like")
+    void likeEvent(@PathVariable Long eventId, @RequestHeader("X-EWM-USER-ID") Long userId) throws ValidationException;
 
     @GetMapping("/events")
     List<EventShortDto> getFilteredEvents(

@@ -11,7 +11,6 @@ import ru.practicum.api.category.CategoryClient;
 import ru.practicum.api.event.UpdateEventAdminRequest;
 import ru.practicum.api.request.EventRequestClient;
 import ru.practicum.api.user.UserClient;
-import ru.practicum.client.StatsClient;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventState;
@@ -26,6 +25,10 @@ import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.exception.WrongDataException;
+
+import ru.practicum.stats.proto.InteractionsCountRequestProto;
+import ru.practicum.stats.proto.RecommendedEventProto;
+import ru.practicum.stats.client.AnalyzerClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,7 +49,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     final UserClient userClient;
     final CategoryClient categoryClient;
     final EventRequestClient requestClient;
-    final StatsClient statsClient;
+    final AnalyzerClient analyzerClient;
 
     @Override
     public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) throws ValidationException {
@@ -118,31 +121,19 @@ public class AdminEventServiceImpl implements AdminEventService {
         }
 
         if (!eventDtos.isEmpty()) {
-            HashMap<Long, Integer> eventIdsWithViewsCounter = new HashMap<>();
-            LocalDateTime startTime = LocalDateTime.parse(eventDtos.getFirst().getCreatedOn().replace(" ", "T"));
-            ArrayList<String> uris = new ArrayList<>();
-            for (EventFullDto dto : eventDtos) {
-                eventIdsWithViewsCounter.put(dto.getId(), 0);
-                uris.add("/events/" + dto.getId().toString());
-                if (startTime.isAfter(LocalDateTime.parse(dto.getCreatedOn().replace(" ", "T")))) {
-                    startTime = LocalDateTime.parse(dto.getCreatedOn().replace(" ", "T"));
-                }
-            }
-
-            var viewsCounter = statsClient.getAllStats(startTime, LocalDateTime.now(), uris, true);
-            for (var statsDto : viewsCounter) {
-                String[] split = statsDto.getUri().split("/");
-                eventIdsWithViewsCounter.put(Long.parseLong(split[2]), Math.toIntExact(statsDto.getHits()));
-            }
-            ArrayList<Long> longs = new ArrayList<>(eventIdsWithViewsCounter.keySet());
+            ArrayList<Long> longs = eventDtos.stream()
+                    .map(EventFullDto::getId).collect(Collectors.toCollection(ArrayList::new));
             List<EventRequestDto> requests = requestClient.getByEventAndStatus(longs, "CONFIRMED");
+            Map<Long, Double> eventRating = analyzerClient.getInteractionsCount(getInteractionsRequest(longs))
+                    .stream().collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+
             return eventDtos.stream()
                     .peek(dto -> dto.setConfirmedRequests(
                             requests.stream()
                                     .filter((request -> request.getEvent().equals(dto.getId())))
                                     .count()
                     ))
-                    .peek(dto -> dto.setViews(eventIdsWithViewsCounter.get(dto.getId())))
+                    .peek(dto -> eventRating.getOrDefault(dto.getId(), 0.0))
                     .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
@@ -238,13 +229,15 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     EventFullDto getViewsCounter(EventFullDto eventFullDto) {
-        ArrayList<String> urls = new ArrayList<>(List.of("/events/" + eventFullDto.getId()));
-        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
-        LocalDateTime end = LocalDateTime.now();
-
-        Integer views = statsClient.getAllStats(start, end, urls, true).size();
-        eventFullDto.setViews(views);
+        List<RecommendedEventProto> protos = analyzerClient.getInteractionsCount(
+                getInteractionsRequest(List.of(eventFullDto.getId()))
+        );
+        Double rating = protos.isEmpty() ? 0.0 : protos.getFirst().getScore();
+        eventFullDto.setRating(rating);
         return eventFullDto;
     }
 
+    private InteractionsCountRequestProto getInteractionsRequest(List<Long> eventId) {
+        return InteractionsCountRequestProto.newBuilder().addAllEventId(eventId).build();
+    }
 }

@@ -47,4 +47,7 @@ public interface EventRequestInterface {
 
     @GetMapping("/inner/request/events")
     List<EventRequestDto> findByEventIds(@RequestParam List<Long> id);
+
+    @GetMapping("/inner/{userId}/take/{eventId}")
+    boolean isUserTakePart(@PathVariable Long userId, @PathVariable Long eventId);
 }

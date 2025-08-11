@@ -1,0 +1,4 @@
+kafkaconfig:
+  url: "localhost:9092"
+  topic: "stats.user-actions.v1"
+grpc.server.port: 0

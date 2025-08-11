@@ -10,7 +10,6 @@ import ru.practicum.api.category.CategoryClient;
 import ru.practicum.api.event.UpdateEventUserRequest;
 import ru.practicum.api.request.EventRequestClient;
 import ru.practicum.api.user.UserClient;
-import ru.practicum.client.StatsClient;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.event.*;
 import ru.practicum.dto.user.UserDto;
@@ -22,10 +21,12 @@ import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.exception.WrongDataException;
+import ru.practicum.stats.client.AnalyzerClient;
+import ru.practicum.stats.proto.InteractionsCountRequestProto;
+import ru.practicum.stats.proto.RecommendedEventProto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +45,7 @@ public class UserEventServiceImpl implements UserEventService {
     final UserClient userClient;
     final CategoryClient categoryClient;
     final EventRequestClient requestClient;
-
-    final StatsClient statsClient;
+    final AnalyzerClient analyzerClient;
 
     private static void validationEventDate(Event event) throws ValidationException, WrongDataException {
         if (LocalDateTime.now().isAfter(event.getEventDate().minusHours(1))) {
@@ -94,7 +94,6 @@ public class UserEventServiceImpl implements UserEventService {
 
     @Override
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest eventDto) throws ConflictException, NotFoundException, ValidationException, WrongDataException {
-        log.info("Users...");
         log.info("Редактирование данных события и его статуса");
         Event event = getEventById(eventId);
         UserDto user = getUserById(userId);
@@ -110,7 +109,7 @@ public class UserEventServiceImpl implements UserEventService {
         locationRepository.save(event.getLocation());
         eventRepository.save(event);
         Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
-        return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed,
+        return getRatingCounter(EventMapper.mapEventToFullDto(event, confirmed,
                 categoryClient.getCategoryById(event.getCategory()), user));
     }
 
@@ -138,7 +137,7 @@ public class UserEventServiceImpl implements UserEventService {
             throw new ValidationException("Пользователь " + userId + " не является инициатором события " + eventId);
         }
         Long confirmed = requestClient.countByEventAndStatuses(event.getId(), List.of("CONFIRMED"));
-        return getViewsCounter(EventMapper.mapEventToFullDto(event, confirmed,
+        return getRatingCounter(EventMapper.mapEventToFullDto(event, confirmed,
                 categoryClient.getCategoryById(event.getCategory()), user));
     }
 
@@ -200,13 +199,12 @@ public class UserEventServiceImpl implements UserEventService {
         }
     }
 
-    EventFullDto getViewsCounter(EventFullDto eventFullDto) {
-        ArrayList<String> urls = new ArrayList<>(List.of("/events/" + eventFullDto.getId()));
-        LocalDateTime start = LocalDateTime.parse(eventFullDto.getCreatedOn(), DateTimeFormatter.ofPattern(JSON_FORMAT_PATTERN_FOR_TIME));
-        LocalDateTime end = LocalDateTime.now();
-
-        Integer views = statsClient.getAllStats(start, end, urls, true).size();
-        eventFullDto.setViews(views);
+    EventFullDto getRatingCounter(EventFullDto eventFullDto) {
+        List<RecommendedEventProto> recommendedEventProtoList = analyzerClient.getInteractionsCount(
+                InteractionsCountRequestProto.newBuilder().addEventId(eventFullDto.getId()).build()
+        );
+        Double rating = recommendedEventProtoList.isEmpty() ? 0.0 : recommendedEventProtoList.getFirst().getScore();
+        eventFullDto.setRating(rating);
         return eventFullDto;
     }
 }

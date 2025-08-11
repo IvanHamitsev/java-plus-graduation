@@ -58,4 +58,9 @@ public class RequestController implements EventRequestInterface {
     public List<EventRequestDto> findByEventIds(List<Long> id) {
         return requestService.findByEventIds(id);
     }
+
+    @Override
+    public boolean isUserTakePart(Long userId, Long eventId) {
+        return requestService.ifUserTakePart(userId, eventId);
+    }
 }

@@ -1,0 +1,22 @@
+grpc.server.port: 0
+kafkaconfig:
+  url: "localhost:9092"
+  action: "stats.user-actions.v1"
+  similarity: "stats.events-similarity.v1"
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc.time_zone: UTC
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/explore-stats
+    username: vxuser
+    password: vxpasswd
