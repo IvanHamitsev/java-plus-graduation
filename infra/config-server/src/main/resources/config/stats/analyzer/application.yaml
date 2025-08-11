@@ -1,6 +1,6 @@
 grpc.server.port: 0
 kafkaconfig:
-  url: "kafka:29092"
+  url: "localhost:29092"
   action: "stats.user-actions.v1"
   similarity: "stats.events-similarity.v1"
 spring:
