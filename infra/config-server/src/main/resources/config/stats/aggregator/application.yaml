@@ -2,7 +2,7 @@ server:
   port: 0
   uri: http://${spring.application.name}:${server.port}
 kafkaconfig:
-  url: "localhost:9092"
+  url: "kafka:29092"
   action: "stats.user-actions.v1"
   similarity: "stats.events-similarity.v1"
 spring:

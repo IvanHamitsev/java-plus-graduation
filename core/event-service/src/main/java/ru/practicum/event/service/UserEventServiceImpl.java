@@ -64,7 +64,6 @@ public class UserEventServiceImpl implements UserEventService {
 
     @Override
     public EventFullDto addEvent(Long userId, NewEventDto eventDto) throws ValidationException, WrongDataException, NotFoundException, ConflictException {
-        log.info("Users...");
         log.info("Добавление нового события пользователем {}", userId);
         UserDto user = getUserById(userId);
         CategoryDto category = categoryClient.getCategoryById(eventDto.getCategory());
@@ -95,7 +94,6 @@ public class UserEventServiceImpl implements UserEventService {
 
     @Override
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest eventDto) throws ConflictException, NotFoundException, ValidationException, WrongDataException {
-        log.info("Users...");
         log.info("Редактирование данных события и его статуса");
         Event event = getEventById(eventId);
         UserDto user = getUserById(userId);

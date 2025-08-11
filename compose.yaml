@@ -28,5 +28,5 @@ services:
                              --bootstrap-server kafka:29092 && \
                 kafka-topics --create --topic stats.events-similarity.v1 \
                              --partitions 1 --replication-factor 1 --if-not-exists \
-                             --bootstrap-server kafka:29092 && \'"
+                             --bootstrap-server kafka:29092'"
     init: true

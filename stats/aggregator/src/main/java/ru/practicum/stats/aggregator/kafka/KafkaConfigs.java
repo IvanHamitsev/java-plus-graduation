@@ -31,7 +31,7 @@ public class KafkaConfigs {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "action");
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, url);
 
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, VoidDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, UserActionAvroDeserializer.class);
